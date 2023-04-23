@@ -25,51 +25,81 @@ public class CurrentAccount extends BankAccount{
 
         if(!isNumberValid(tradeLicenseId))
         {
-            if(!canNumberBeValid(tradeLicenseId))
-            {
+            String rearranged = RearrangeString(tradeLicenseId);
+            if(rearranged==""){
                 throw new Exception("Valid License can not be generated");
             }
+            else
+                this.tradeLicenseId = rearranged;
         }
-
     }
 
-    public boolean isNumberValid(String number)
+    public char getCountChar(int[] count)
     {
-        for(int i=1; i<number.length(); i++)
+        int max =0;
+        char ch =0;
+        for(int i=0;i<26;i++)
         {
-            if(number.charAt(i)==number.charAt(i-1))
+            if(count[i]>max)
             {
-                return false;
+                max = count[i];
+                ch = (char)((int)'A'+i);
             }
         }
-
+        return ch;
+    }
+    public String RearrangeString(String s)
+    {
+        int N = s.length();
+        int[] count = new int[26];
+        for(int i=0;i<26;i++)
+        {
+            count[i] =0;
+        }
+        for(char c : s.toCharArray())
+        {
+            count[(int)c-(int)'A']++;
+        }
+        char c_max = getCountChar(count);
+        int maxCount = count[(int)c_max-(int)'A'];
+        if(maxCount>(N+1)/2)
+            return "";
+        String res = "";
+        for(int i=0;i<N;i++)
+        {
+            res +=' ';
+        }
+        int ind =0;
+        while(maxCount>0)
+        {
+            res = res.substring(0,ind)+c_max+res.substring(ind+1);
+            ind = ind+2;
+            maxCount--;
+        }
+        count[(int)c_max-(int)'A'] = 0;
+        for(int i =0;i<26;i++)
+        {
+            while(count[i]>0)
+            {
+                ind=(ind>=N)?1:ind;
+                res = res.substring(0,ind)+(char)((int)'A'+i)+res.substring(ind+1);
+                ind+=2;
+                count[i]--;
+            }
+        }
+        return res;
+    }
+    public boolean isNumberValid(String licenseId)
+    {
+        for(int i=0;i<licenseId.length()-1;i++)
+        {
+            if(licenseId.charAt(i)==licenseId.charAt(i+1)) return false;
+        }
         return true;
     }
 
-
-    public boolean canNumberBeValid(String number)
-    {
-        int n = number.length();
-
-        HashMap<Character,Integer> hm = new HashMap<>();
-        for(int i=0;i<n; i++)
-        {
-            hm.put(number.charAt(i),hm.getOrDefault(number.charAt(i),0)+1);
-        }
-
-        for(int c: hm.values())
-        {
-            if(c >1)
-            {
-                int d = n-c;
-
-                if(d+1 <c)
-                {
-                   return false;
-                }
-            }
-        }
-
-        return true;
+    public String getTradeLicenseId() {
+        return tradeLicenseId;
     }
 }
+
